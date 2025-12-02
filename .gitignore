@@ -1,0 +1,24 @@
+node_modules/
+dist/
+coverage/
+.turbo/
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+
+# Foundry
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+
+# CLI test projects and bundles
+packages/cli/test/.work/
+.tidemark/
+packages/create-tidemark/test/.work/
+packages/*/test/.work/
+
+# Terraform working state
+**/.terraform/
+*.tfstate
+*.tfstate.*

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", "helpers:pinGitHubActionDigests", ":pinAllExceptPeerDependencies"],
+  "minimumReleaseAge": "7 days",
+  "packageRules": [
+    {
+      "matchPackageNames": ["viem", "abitype"],
+      "groupName": "viem",
+      "description": "Decoding changes must pass the decoding integration tests before merge."
+    },
+    {
+      "matchPackageNames": ["eslint", "@eslint/js", "typescript-eslint", "typescript"],
+      "groupName": "lint and compiler"
+    }
+  ]
+}

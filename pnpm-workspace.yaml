@@ -1,0 +1,15 @@
+packages:
+  - packages/*
+  - contracts
+  - bench
+  - infra
+minimumReleaseAgeExclude:
+  - "@vitest/mocker@5.1.0"
+  - "@vitest/spy@5.1.0"
+  - viem@2.57.15
+  - vitest@5.1.0
+  - "@hono/node-server@2.1.6"
+  - "@tanstack/query-core@5.105.3"
+  - "@tanstack/react-query@5.105.3"
+allowBuilds:
+  esbuild: true

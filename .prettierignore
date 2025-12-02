@@ -1,0 +1,9 @@
+pnpm-lock.yaml
+contracts/lib/
+contracts/out/
+contracts/cache/
+contracts/ts/artifacts.generated.ts
+**/test/fixtures/*.fixture.json
+
+# Helm templates are Go templates, not YAML, until rendered.
+infra/helm/**/templates/**
