@@ -1,0 +1,52 @@
+{
+  "name": "@tidemark/core",
+  "version": "1.0.1",
+  "description": "Pure logic for Tidemark: checkpoints, intervals, ordering. No I/O.",
+  "keywords": [
+    "ethereum",
+    "evm",
+    "indexer",
+    "checkpoints",
+    "metrics"
+  ],
+  "license": "MIT",
+  "author": "Provokke",
+  "homepage": "https://github.com/Provokke/tidemark#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Provokke/tidemark.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/Provokke/tidemark/issues"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=24"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --exclude '**/*.integration.test.ts' --passWithNoTests"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.2",
+    "fast-check": "4.10.2",
+    "typescript": "6.0.3",
+    "vitest": "5.1.0"
+  }
+}
