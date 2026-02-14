@@ -1,0 +1,54 @@
+{
+  "name": "@tidemark/schema",
+  "version": "1.0.1",
+  "description": "Tidemark's schema DSL: typed onchain tables that compile to Postgres DDL, row codecs and API types.",
+  "keywords": [
+    "schema",
+    "postgres",
+    "orm"
+  ],
+  "license": "MIT",
+  "author": "Provokke",
+  "homepage": "https://github.com/Provokke/tidemark#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Provokke/tidemark.git",
+    "directory": "packages/schema"
+  },
+  "bugs": {
+    "url": "https://github.com/Provokke/tidemark/issues"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --exclude '**/*.integration.test.ts' --passWithNoTests",
+    "test:integration": "vitest run integration"
+  },
+  "dependencies": {
+    "@tidemark/pg": "workspace:*"
+  },
+  "devDependencies": {
+    "@tidemark/testing": "workspace:*",
+    "@types/node": "24.19.2",
+    "fast-check": "4.10.2",
+    "typescript": "6.0.3",
+    "vitest": "5.1.0"
+  }
+}
