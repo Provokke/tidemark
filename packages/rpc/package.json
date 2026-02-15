@@ -1,0 +1,62 @@
+{
+  "name": "@tidemark/rpc",
+  "version": "1.0.1",
+  "description": "Tidemark's JSON-RPC pool: failover, health, rate limits, lagging-node head checks, redaction of provider URLs.",
+  "keywords": [
+    "ethereum",
+    "json-rpc",
+    "rpc",
+    "failover",
+    "receipts",
+    "bloom"
+  ],
+  "license": "MIT",
+  "author": "Provokke",
+  "homepage": "https://github.com/Provokke/tidemark#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Provokke/tidemark.git",
+    "directory": "packages/rpc"
+  },
+  "bugs": {
+    "url": "https://github.com/Provokke/tidemark/issues"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --exclude '**/*.integration.test.ts' --passWithNoTests",
+    "test:integration": "vitest run integration",
+    "verify-receipts": "tsx scripts/verify-receipts.ts"
+  },
+  "dependencies": {
+    "@noble/hashes": "2.4.0",
+    "@tidemark/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@tidemark/contracts": "workspace:*",
+    "@tidemark/testing": "workspace:*",
+    "@types/node": "24.19.2",
+    "fast-check": "4.10.2",
+    "tsx": "4.23.15",
+    "typescript": "6.0.3",
+    "viem": "2.57.15",
+    "vitest": "5.1.0"
+  }
+}
