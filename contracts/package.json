@@ -1,0 +1,33 @@
+{
+  "name": "@tidemark/contracts",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Fixture contracts for Tidemark's tests, with their ABIs and bytecode as typed TypeScript.",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "forge:build": "forge build --sizes",
+    "forge:test": "forge test",
+    "forge:fmt": "forge fmt --check",
+    "generate": "forge build && node scripts/generate-artifacts.mjs",
+    "test:integration": "vitest run integration"
+  },
+  "dependencies": {
+    "viem": "2.57.15"
+  },
+  "devDependencies": {
+    "@tidemark/testing": "workspace:*",
+    "@types/node": "24.19.2",
+    "fast-check": "4.10.2",
+    "typescript": "6.0.3",
+    "vitest": "5.1.0"
+  }
+}
