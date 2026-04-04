@@ -1,0 +1,64 @@
+{
+  "name": "@tidemark/engine",
+  "version": "1.0.1",
+  "description": "Tidemark's indexing engine: config, typed handler registry, event decoding and ordering, and the indexing loop.",
+  "keywords": [
+    "ethereum",
+    "evm",
+    "indexer",
+    "reorg",
+    "handlers"
+  ],
+  "license": "MIT",
+  "author": "Provokke",
+  "homepage": "https://github.com/Provokke/tidemark#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Provokke/tidemark.git",
+    "directory": "packages/engine"
+  },
+  "bugs": {
+    "url": "https://github.com/Provokke/tidemark/issues"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --exclude '**/*.integration.test.ts' --passWithNoTests",
+    "test:integration": "vitest run integration"
+  },
+  "dependencies": {
+    "@tidemark/core": "workspace:*",
+    "@tidemark/pg": "workspace:*",
+    "@tidemark/rpc": "workspace:*",
+    "@tidemark/schema": "workspace:*",
+    "@tidemark/store": "workspace:*",
+    "@tidemark/sync": "workspace:*",
+    "viem": "2.57.15"
+  },
+  "devDependencies": {
+    "@tidemark/api": "workspace:*",
+    "@tidemark/contracts": "workspace:*",
+    "@tidemark/testing": "workspace:*",
+    "@types/node": "24.19.2",
+    "fast-check": "4.10.2",
+    "typescript": "6.0.3",
+    "vitest": "5.1.0"
+  }
+}
