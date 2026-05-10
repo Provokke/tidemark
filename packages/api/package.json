@@ -1,0 +1,64 @@
+{
+  "name": "@tidemark/api",
+  "version": "1.0.1",
+  "description": "Tidemark's query API: generated GraphQL, a read-only SQL endpoint and status, served with Hono.",
+  "keywords": [
+    "graphql",
+    "sql",
+    "live-queries",
+    "api"
+  ],
+  "license": "MIT",
+  "author": "Provokke",
+  "homepage": "https://github.com/Provokke/tidemark#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Provokke/tidemark.git",
+    "directory": "packages/api"
+  },
+  "bugs": {
+    "url": "https://github.com/Provokke/tidemark/issues"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --exclude '**/*.integration.test.ts' --passWithNoTests",
+    "test:integration": "vitest run integration"
+  },
+  "dependencies": {
+    "@hono/node-server": "2.1.6",
+    "@tidemark/core": "workspace:*",
+    "@tidemark/pg": "workspace:*",
+    "@tidemark/schema": "workspace:*",
+    "dataloader": "2.2.3",
+    "graphql": "17.0.2",
+    "hono": "4.13.16",
+    "libpg-query": "17.8.2",
+    "ws": "8.18.3"
+  },
+  "devDependencies": {
+    "@tidemark/testing": "workspace:*",
+    "@types/node": "24.19.2",
+    "@types/ws": "8.18.1",
+    "fast-check": "4.10.2",
+    "typescript": "6.0.3",
+    "vitest": "5.1.0"
+  }
+}
