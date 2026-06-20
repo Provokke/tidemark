@@ -1,0 +1,63 @@
+{
+  "name": "@tidemark/outbox",
+  "version": "1.0.1",
+  "description": "Delivers context.outbox messages: webhooks (signed, SSRF-guarded), SQS, NATS JetStream and Kafka, with retries, retractions on reorg, dead letters and redrive.",
+  "keywords": [
+    "webhooks",
+    "outbox",
+    "sqs",
+    "nats",
+    "kafka"
+  ],
+  "license": "MIT",
+  "author": "Provokke",
+  "homepage": "https://github.com/Provokke/tidemark#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Provokke/tidemark.git",
+    "directory": "packages/outbox"
+  },
+  "bugs": {
+    "url": "https://github.com/Provokke/tidemark/issues"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --exclude '**/*.integration.test.ts' --passWithNoTests",
+    "test:integration": "vitest run integration"
+  },
+  "dependencies": {
+    "@tidemark/core": "workspace:*",
+    "@tidemark/engine": "workspace:*",
+    "@tidemark/pg": "workspace:*"
+  },
+  "devDependencies": {
+    "@tidemark/api": "workspace:*",
+    "@tidemark/contracts": "workspace:*",
+    "@tidemark/schema": "workspace:*",
+    "@tidemark/testing": "workspace:*",
+    "@types/node": "24.19.2",
+    "kafkajs": "2.2.4",
+    "nats": "2.29.3",
+    "typescript": "6.0.3",
+    "viem": "2.57.15",
+    "vitest": "5.1.0"
+  }
+}
