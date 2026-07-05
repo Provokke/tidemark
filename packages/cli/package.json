@@ -1,0 +1,67 @@
+{
+  "name": "@tidemark/cli",
+  "version": "1.0.1",
+  "description": "The tidemark command: dev with hot reload, start, serve, deploy, promote, rollback, builds, codegen and database tasks.",
+  "keywords": [
+    "cli",
+    "indexer",
+    "ethereum"
+  ],
+  "license": "MIT",
+  "author": "Provokke",
+  "homepage": "https://github.com/Provokke/tidemark#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Provokke/tidemark.git",
+    "directory": "packages/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/Provokke/tidemark/issues"
+  },
+  "type": "module",
+  "bin": {
+    "tidemark": "./dist/bin.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --exclude '**/*.integration.test.ts' --passWithNoTests",
+    "test:integration": "vitest run integration"
+  },
+  "dependencies": {
+    "@tidemark/api": "workspace:*",
+    "@tidemark/core": "workspace:*",
+    "@tidemark/engine": "workspace:*",
+    "@tidemark/outbox": "workspace:*",
+    "@tidemark/pg": "workspace:*",
+    "@tidemark/rpc": "workspace:*",
+    "@tidemark/schema": "workspace:*",
+    "@tidemark/sync": "workspace:*",
+    "esbuild": "0.28.2",
+    "graphql": "17.0.2"
+  },
+  "devDependencies": {
+    "@tidemark/contracts": "workspace:*",
+    "@tidemark/testing": "workspace:*",
+    "@types/node": "24.19.2",
+    "typescript": "6.0.3",
+    "viem": "2.57.15",
+    "vitest": "5.1.0"
+  }
+}

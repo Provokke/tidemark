@@ -1,0 +1,6 @@
+{
+  "extends": "../../../../../tsconfig.base.json",
+  "compilerOptions": { "noEmit": true, "rootDir": ".", "module": "preserve", "moduleResolution": "bundler" },
+  "include": ["**/*.ts"],
+  "exclude": [".tidemark", "node_modules"]
+}
