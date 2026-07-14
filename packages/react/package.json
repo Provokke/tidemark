@@ -1,0 +1,67 @@
+{
+  "name": "@tidemark/react",
+  "version": "1.0.1",
+  "description": "React hooks for a Tidemark API, on TanStack Query: typed queries and live queries that update in place.",
+  "keywords": [
+    "react",
+    "tanstack-query",
+    "live-queries"
+  ],
+  "license": "MIT",
+  "author": "Provokke",
+  "homepage": "https://github.com/Provokke/tidemark#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Provokke/tidemark.git",
+    "directory": "packages/react"
+  },
+  "bugs": {
+    "url": "https://github.com/Provokke/tidemark/issues"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=24"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --exclude '**/*.integration.test.*' --passWithNoTests",
+    "test:integration": "vitest run integration"
+  },
+  "dependencies": {
+    "@tidemark/client": "workspace:*"
+  },
+  "peerDependencies": {
+    "@tanstack/react-query": "^5.0.0",
+    "react": "^18.2.0 || ^19.0.0"
+  },
+  "devDependencies": {
+    "@tanstack/react-query": "5.105.3",
+    "@testing-library/react": "16.3.3",
+    "@tidemark/api": "workspace:*",
+    "@tidemark/pg": "workspace:*",
+    "@tidemark/schema": "workspace:*",
+    "@tidemark/testing": "workspace:*",
+    "@types/node": "24.19.2",
+    "@types/react": "19.3.0",
+    "happy-dom": "21.0.4",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "typescript": "6.0.3",
+    "vitest": "5.1.0"
+  }
+}

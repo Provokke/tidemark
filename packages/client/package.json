@@ -1,0 +1,60 @@
+{
+  "name": "@tidemark/client",
+  "version": "1.0.1",
+  "description": "Typed client for a Tidemark API: a Kysely query builder over the SQL endpoint, typed from your schema.",
+  "keywords": [
+    "kysely",
+    "client",
+    "sql"
+  ],
+  "license": "MIT",
+  "author": "Provokke",
+  "homepage": "https://github.com/Provokke/tidemark#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Provokke/tidemark.git",
+    "directory": "packages/client"
+  },
+  "bugs": {
+    "url": "https://github.com/Provokke/tidemark/issues"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=24"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --exclude '**/*.integration.test.ts' --passWithNoTests",
+    "test:integration": "vitest run integration"
+  },
+  "dependencies": {
+    "kysely": "0.29.8"
+  },
+  "peerDependencies": {
+    "@tidemark/schema": "workspace:*"
+  },
+  "devDependencies": {
+    "@tidemark/api": "workspace:*",
+    "@tidemark/pg": "workspace:*",
+    "@tidemark/schema": "workspace:*",
+    "@tidemark/testing": "workspace:*",
+    "@types/node": "24.19.2",
+    "typescript": "6.0.3",
+    "vitest": "5.1.0"
+  }
+}
