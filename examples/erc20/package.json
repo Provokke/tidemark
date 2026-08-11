@@ -1,0 +1,22 @@
+{
+  "name": "erc20",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tidemark dev",
+    "start": "tidemark start --serve",
+    "serve": "tidemark serve",
+    "codegen": "tidemark codegen",
+    "typecheck": "tidemark codegen && tsc --noEmit"
+  },
+  "dependencies": {
+    "@tidemark/cli": "^1.0.1",
+    "@tidemark/engine": "^1.0.1",
+    "@tidemark/schema": "^1.0.1"
+  },
+  "devDependencies": {
+    "@tidemark/testing": "^1.0.1",
+    "@types/node": "^24.0.0",
+    "typescript": "^6.0.3"
+  }
+}
