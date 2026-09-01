@@ -1,0 +1,18 @@
+{
+  "name": "@tidemark/infra",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Checks for the deployment files: Compose, Prometheus, Grafana, Helm, Terraform and workflows.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.2",
+    "typescript": "6.0.3",
+    "vitest": "5.1.0",
+    "yaml": "2.8.4"
+  }
+}

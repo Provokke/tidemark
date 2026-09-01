@@ -1,0 +1,33 @@
+{{- if .Values.migrations.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "tidemark.fullname" . }}-migrate-{{ .Release.Revision }}
+  labels:
+    {{- include "tidemark.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook-weight: "0"
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        {{- include "tidemark.selector" . | nindent 8 }}
+        app.kubernetes.io/component: migrations
+    spec:
+      restartPolicy: OnFailure
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: migrate
+          image: {{ include "tidemark.image" . }}
+          args: ["db", "migrate"]
+          env:
+            {{- include "tidemark.env" . | nindent 12 }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          {{- include "tidemark.volumeMounts" . | nindent 10 }}
+      {{- include "tidemark.volumes" . | nindent 6 }}
+{{- end }}

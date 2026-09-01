@@ -1,0 +1,7 @@
+Tidemark {{ .Chart.AppVersion }} is installed.
+
+The API: kubectl port-forward svc/{{ include "tidemark.fullname" . }}-api {{ .Values.api.port }}
+then POST http://localhost:{{ .Values.api.port }}/graphql or /sql, GET /status.
+
+Deploy a new build: set indexer.command to [deploy] for one upgrade (it goes live once caught up),
+or run `tidemark deploy --exit-when-live` as a Job with the new image.

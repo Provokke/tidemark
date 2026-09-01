@@ -1,0 +1,68 @@
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "tidemark.fullname" . }}
+  labels:
+    {{- include "tidemark.labels" . | nindent 4 }}
+  {{- with .Values.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with .Values.ingress.className }}
+  ingressClassName: {{ . }}
+  {{- end }}
+  {{- with .Values.ingress.tls }}
+  tls:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  rules:
+    {{- range .Values.ingress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+          {{- range .paths }}
+          - path: {{ . }}
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "tidemark.fullname" $ }}-api
+                port:
+                  name: http
+          {{- end }}
+    {{- end }}
+---
+{{- end }}
+{{- if .Values.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "tidemark.fullname" . }}
+  labels:
+    {{- include "tidemark.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "tidemark.selector" . | nindent 6 }}
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: {{ .Values.serviceMonitor.interval }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "tidemark.fullname" . }}-indexer-metrics
+  labels:
+    {{- include "tidemark.labels" . | nindent 4 }}
+    app.kubernetes.io/component: indexer
+spec:
+  selector:
+    {{- include "tidemark.selector" . | nindent 4 }}
+    app.kubernetes.io/component: indexer
+  ports:
+    - name: http
+      port: {{ .Values.indexer.metricsPort }}
+      targetPort: metrics
+{{- end }}

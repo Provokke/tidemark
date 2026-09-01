@@ -1,0 +1,82 @@
+# The project image: built FROM ghcr.io/provokke/tidemark with the project in /opt/tidemark/project.
+image:
+  repository: ghcr.io/provokke/tidemark
+  tag: "1.0.1"
+  pullPolicy: IfNotPresent
+imagePullSecrets: []
+
+# Postgres 16+ (CloudNativePG is a good operator). The secret holds a full URL under `key`.
+database:
+  existingSecret: tidemark-database
+  key: url
+
+# RPC URLs and other secrets the project's config reads, as environment variables, from this secret.
+envFromSecret: tidemark-env
+env: {}
+
+# The live schema the API serves and deploys promote to.
+live: live
+
+indexer:
+  # A second replica waits on the build's advisory lock as a hot standby.
+  replicas: 1
+  # `start` resumes the current build; `deploy` makes a new build live once it has caught up.
+  command: [start]
+  resources:
+    requests: { cpu: 250m, memory: 512Mi }
+    limits: { memory: 1Gi }
+  metricsPort: 9464
+
+api:
+  replicas: 2
+  port: 42069
+  resources:
+    requests: { cpu: 100m, memory: 256Mi }
+    limits: { memory: 512Mi }
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 8
+    targetCPUUtilizationPercentage: 60
+  # SHA-256 hex digests of API keys, comma-separated, from this secret's `key` (empty: open API).
+  apiKeys:
+    existingSecret: ""
+    key: hashes
+  publicMetrics: true
+
+service:
+  type: ClusterIP
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: indexer.example.com
+      paths: ["/"]
+  tls: []
+
+# A ServiceMonitor for the Prometheus operator.
+serviceMonitor:
+  enabled: false
+  interval: 30s
+
+# A Job that runs `tidemark db migrate` before installs and upgrades.
+migrations:
+  enabled: true
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+  seccompProfile: { type: RuntimeDefault }
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities: { drop: [ALL] }
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

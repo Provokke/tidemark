@@ -1,0 +1,96 @@
+# Tidemark with Postgres, Prometheus and Grafana, on one machine.
+#
+#   cp .env.example .env            # set MAINNET_RPC_URL (and TOKEN_ADDRESS for the example)
+#   docker compose up -d
+#
+# The API is on http://localhost:42069, Grafana on http://localhost:3000 (admin / $GRAFANA_PASSWORD).
+# TIDEMARK_PROJECT points at the project to index (default: the ERC-20 example).
+
+name: tidemark
+
+x-tidemark: &tidemark
+  image: ${TIDEMARK_IMAGE:-ghcr.io/provokke/tidemark:1.0.1}
+  build:
+    context: ../..
+  environment:
+    DATABASE_URL: postgres://tidemark:${POSTGRES_PASSWORD:-tidemark}@postgres:5432/tidemark
+    TIDEMARK_LOG_FORMAT: json
+  env_file:
+    - path: .env
+      required: false
+  volumes:
+    - ${TIDEMARK_PROJECT:-../../examples/erc20}:/opt/tidemark/project
+  restart: unless-stopped
+  depends_on:
+    migrate:
+      condition: service_completed_successfully
+
+services:
+  postgres:
+    image: postgres:17.6-alpine
+    environment:
+      POSTGRES_USER: tidemark
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-tidemark}
+      POSTGRES_DB: tidemark
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tidemark -d tidemark"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+    restart: unless-stopped
+
+  migrate:
+    <<: *tidemark
+    command: ["db", "migrate"]
+    restart: "no"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # Indexes the project and delivers its outbox. A second replica would wait as a standby.
+  indexer:
+    <<: *tidemark
+    command: ["start", "--metrics-port", "9464"]
+
+  api:
+    <<: *tidemark
+    command: ["serve", "--port", "42069"]
+    environment:
+      DATABASE_URL: postgres://tidemark:${POSTGRES_PASSWORD:-tidemark}@postgres:5432/tidemark
+      TIDEMARK_LOG_FORMAT: json
+      TIDEMARK_PUBLIC_METRICS: "true"
+      HOST: 0.0.0.0
+    ports:
+      - "42069:42069"
+
+  prometheus:
+    image: prom/prometheus:v3.5.0
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=15d
+    volumes:
+      - ./prometheus:/etc/prometheus:ro
+      - prometheus:/prometheus
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:12.1.1
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-tidemark}
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
+volumes:
+  postgres:
+  prometheus:
+  grafana:

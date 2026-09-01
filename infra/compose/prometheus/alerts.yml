@@ -1,0 +1,74 @@
+# Alerts for a Tidemark deployment. The same conditions are CloudWatch alarms in the Terraform module.
+groups:
+  - name: tidemark
+    rules:
+      - alert: TidemarkIndexerDown
+        expr: up{job="tidemark-indexer"} == 0
+        for: 2m
+        labels: { severity: critical }
+        annotations:
+          summary: The indexer is not answering scrapes.
+
+      - alert: TidemarkApiDown
+        expr: up{job="tidemark-api"} == 0
+        for: 2m
+        labels: { severity: critical }
+        annotations:
+          summary: The API is not answering scrapes.
+
+      - alert: TidemarkRealtimeLag
+        expr: max by (chain) (tm_realtime_lag_blocks) > 10
+        for: 5m
+        labels: { severity: warning }
+        annotations:
+          summary: "{{ $labels.chain }} is {{ $value }} blocks behind its head."
+
+      - alert: TidemarkNotProgressing
+        expr: changes(tm_processed_block[15m]) == 0 and on (chain) tm_realtime_lag_blocks > 0
+        labels: { severity: critical }
+        annotations:
+          summary: "{{ $labels.chain }} has handled no block in 15 minutes while behind its head (halted build, or every RPC down)."
+
+      - alert: TidemarkRpcErrors
+        expr: |
+          sum by (chain) (rate(tm_rpc_requests_total{outcome!="ok"}[5m]))
+            / sum by (chain) (rate(tm_rpc_requests_total[5m])) > 0.2
+        for: 10m
+        labels: { severity: warning }
+        annotations:
+          summary: "More than 20% of RPC requests on chain {{ $labels.chain }} fail."
+
+      - alert: TidemarkDeepReorgs
+        expr: increase(tm_reorgs_total[1h]) > 20
+        labels: { severity: warning }
+        annotations:
+          summary: "{{ $labels.chain }} had {{ $value }} reorgs in an hour."
+
+      - alert: TidemarkApiErrors
+        expr: |
+          sum(rate(tm_api_requests_total{status=~"5.."}[5m])) / sum(rate(tm_api_requests_total[5m])) > 0.01
+        for: 5m
+        labels: { severity: critical }
+        annotations:
+          summary: More than 1% of API requests fail with 5xx.
+
+      - alert: TidemarkApiSlow
+        expr: |
+          histogram_quantile(0.95, sum by (le) (rate(tm_api_request_seconds_bucket{route=~"/graphql|/sql"}[5m]))) > 0.15
+        for: 10m
+        labels: { severity: warning }
+        annotations:
+          summary: API p95 latency is over the 150 ms target.
+
+      - alert: TidemarkOutboxDeadLetters
+        expr: max by (live) (tm_outbox_deliveries{status="dead"}) > 0
+        labels: { severity: warning }
+        annotations:
+          summary: "{{ $value }} outbox deliveries are dead; see `tidemark outbox list --status dead`."
+
+      - alert: TidemarkOutboxBacklog
+        expr: max by (live) (tm_outbox_deliveries{status="pending"}) > 1000
+        for: 15m
+        labels: { severity: warning }
+        annotations:
+          summary: "{{ $value }} outbox deliveries are waiting."

@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "tidemark.fullname" . }}-indexer
+  labels:
+    {{- include "tidemark.labels" . | nindent 4 }}
+    app.kubernetes.io/component: indexer
+spec:
+  replicas: {{ .Values.indexer.replicas }}
+  # Never two generations at once: a new pod starts after the old one stops (the standby covers the gap).
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "tidemark.selector" . | nindent 6 }}
+      app.kubernetes.io/component: indexer
+  template:
+    metadata:
+      labels:
+        {{- include "tidemark.selector" . | nindent 8 }}
+        app.kubernetes.io/component: indexer
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: indexer
+          image: {{ include "tidemark.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            {{- range .Values.indexer.command }}
+            - {{ . | quote }}
+            {{- end }}
+            - --live
+            - {{ .Values.live | quote }}
+            - --metrics-port
+            - {{ .Values.indexer.metricsPort | quote }}
+          env:
+            {{- include "tidemark.env" . | nindent 12 }}
+          {{- include "tidemark.envFrom" . | nindent 10 }}
+          ports:
+            - name: metrics
+              containerPort: {{ .Values.indexer.metricsPort }}
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: metrics
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          resources:
+            {{- toYaml .Values.indexer.resources | nindent 12 }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          {{- include "tidemark.volumeMounts" . | nindent 10 }}
+      {{- include "tidemark.volumes" . | nindent 6 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

@@ -1,0 +1,10 @@
+apiVersion: v2
+name: tidemark
+description: A self-hosted, reorg-safe, multi-chain EVM indexer, with its GraphQL, SQL and live API.
+type: application
+version: 1.0.1
+appVersion: "1.0.1"
+home: https://github.com/Provokke/tidemark
+sources:
+  - https://github.com/Provokke/tidemark
+keywords: [ethereum, evm, indexer, graphql, postgres]
