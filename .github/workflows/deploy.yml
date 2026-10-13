@@ -1,0 +1,84 @@
+name: deploy
+
+# Deploys the example project to the AWS module (infra/terraform), the way a project's own
+# workflow would: build the project image, run `tidemark deploy --exit-when-live` as a one-off
+# task (it indexes from the sync cache and cuts over once caught up, while the old build keeps
+# serving), then roll both services onto the new image.
+#
+# Repository variables: AWS_REGION, AWS_DEPLOY_ROLE_ARN, TIDEMARK_NAME (the module's `name`).
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["examples/erc20/**"]
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: vars.AWS_DEPLOY_ROLE_ARN != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      NAME: ${{ vars.TIDEMARK_NAME }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+      - id: ecr
+        uses: aws-actions/amazon-ecr-login@03f1aad4c6c7ffd436567f42f9384779290529bd # v2.1.7
+      - uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4.4.0
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - name: Build and push the project image (ARM64, as the module runs it)
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: examples/erc20
+          platforms: linux/arm64
+          push: true
+          tags: ${{ steps.ecr.outputs.registry }}/${{ env.NAME }}:${{ github.sha }}
+      - name: Register task definitions for the new image
+        id: taskdefs
+        env:
+          IMAGE: ${{ steps.ecr.outputs.registry }}/${{ env.NAME }}:${{ github.sha }}
+        run: |
+          for role in indexer api; do
+            aws ecs describe-task-definition --task-definition "$NAME-$role" --query taskDefinition > td.json
+            jq --arg image "$IMAGE" --arg role "$role" '
+              .containerDefinitions |= map(if .name == $role then .image = $image else . end)
+              | {family, taskRoleArn, executionRoleArn, networkMode, containerDefinitions, requiresCompatibilities, cpu, memory, runtimePlatform}
+            ' td.json > new.json
+            arn=$(aws ecs register-task-definition --cli-input-json file://new.json --query taskDefinition.taskDefinitionArn --output text)
+            echo "$role=$arn" >> "$GITHUB_OUTPUT"
+          done
+      - name: Run the deploy as a one-off task, until the new build is live
+        env:
+          TASKDEF: ${{ steps.taskdefs.outputs.indexer }}
+        run: |
+          network=$(aws ecs describe-services --cluster "$NAME" --services "$NAME-indexer" \
+            --query 'services[0].networkConfiguration' --output json)
+          task=$(aws ecs run-task --cluster "$NAME" --launch-type FARGATE --task-definition "$TASKDEF" \
+            --network-configuration "$network" \
+            --overrides '{"containerOverrides":[{"name":"indexer","command":["deploy","--exit-when-live","--metrics-port","9464"]}]}' \
+            --query 'tasks[0].taskArn' --output text)
+          echo "deploy task: $task"
+          aws ecs wait tasks-stopped --cluster "$NAME" --tasks "$task" || true
+          while [ "$(aws ecs describe-tasks --cluster "$NAME" --tasks "$task" --query 'tasks[0].lastStatus' --output text)" != "STOPPED" ]; do sleep 30; done
+          code=$(aws ecs describe-tasks --cluster "$NAME" --tasks "$task" --query "tasks[0].containers[?name=='indexer'].exitCode | [0]" --output text)
+          echo "exit code: $code"
+          test "$code" = "0"
+      - name: Roll the services onto the new image
+        env:
+          INDEXER: ${{ steps.taskdefs.outputs.indexer }}
+          API: ${{ steps.taskdefs.outputs.api }}
+        run: |
+          aws ecs update-service --cluster "$NAME" --service "$NAME-indexer" --task-definition "$INDEXER" > /dev/null
+          aws ecs update-service --cluster "$NAME" --service "$NAME-api" --task-definition "$API" > /dev/null
+          aws ecs wait services-stable --cluster "$NAME" --services "$NAME-indexer" "$NAME-api"

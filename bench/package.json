@@ -1,0 +1,31 @@
+{
+  "name": "@tidemark/bench",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "description": "Reproducible Tidemark benchmarks. Each prints a JSON result line.",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "erc20": "tsx erc20.ts",
+    "api": "tsx api.ts",
+    "testnet": "tsx testnet.ts"
+  },
+  "dependencies": {
+    "@tidemark/api": "workspace:*",
+    "@tidemark/contracts": "workspace:*",
+    "@tidemark/core": "workspace:*",
+    "@tidemark/engine": "workspace:*",
+    "@tidemark/pg": "workspace:*",
+    "@tidemark/rpc": "workspace:*",
+    "@tidemark/schema": "workspace:*",
+    "@tidemark/sync": "workspace:*",
+    "@tidemark/testing": "workspace:*",
+    "viem": "2.57.15"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.2",
+    "tsx": "4.23.15",
+    "typescript": "6.0.3"
+  }
+}
