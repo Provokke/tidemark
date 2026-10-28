@@ -55,7 +55,7 @@
     "@tidemark/pg": "workspace:*",
     "@tidemark/schema": "workspace:*",
     "@tidemark/testing": "workspace:*",
-    "@types/node": "24.19.2",
+    "@types/node": "^24.0.0",
     "typescript": "6.0.3",
     "vitest": "5.1.0"
   }
